@@ -47,7 +47,7 @@ model GoalChecklist {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
-  Goal      Goal?     @relation(fields: [goalId], references: [id])
+  Goal      Goal?     @relation(fields: [goalId], references: [id], onDelete: Cascade)
 
   @@map("goal_checklist")
 }

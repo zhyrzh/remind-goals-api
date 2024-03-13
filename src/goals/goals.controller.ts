@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { CreateGoalDTO } from './dto/createGoal.dto';
 import { EditGoalDTO } from './dto/editGoaTitlel.dto';
@@ -24,5 +33,10 @@ export class GoalsController {
     @Query('title') title: string,
   ) {
     return await this.goalsService.getAllGoals(count, offset, title);
+  }
+
+  @Delete('/:id')
+  async deleteSpecificGoal(@Param('id') id: string) {
+    return await this.goalsService.deleteSpecificGoal(id);
   }
 }

@@ -48,4 +48,27 @@ export class GoalsService {
       );
     }
   }
+
+  async getAllGoals(count: string, offset: string, title: string) {
+    try {
+      return await this.prismaService.goal.findMany({
+        include: {
+          checklist: true,
+        },
+        take: count ? +count : 10,
+        skip: offset ? +offset : 0,
+        where: {
+          title: {
+            contains: title,
+            mode: 'insensitive',
+          },
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        { reason: `Something went wrong when querying: ${error.meta.details}` },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

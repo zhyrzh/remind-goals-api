@@ -71,4 +71,25 @@ export class GoalsService {
       );
     }
   }
+
+  async deleteSpecificGoal(id: string) {
+    try {
+      return this.prismaService.goal.delete({
+        where: {
+          id: +id,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta.details ? error.meta.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    } finally {
+      await this.prismaService.$disconnect();
+    }
+  }
 }

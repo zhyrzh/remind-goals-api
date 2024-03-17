@@ -39,8 +39,8 @@ model Goal {
 }
 
 model GoalChecklist {
-  id     Int @id @default(autoincrement())
-  goalId Int
+  id     Int  @id @default(autoincrement())
+  goalId Int?
 
   title    String
   isActive Boolean

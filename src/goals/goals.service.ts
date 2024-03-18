@@ -92,4 +92,27 @@ export class GoalsService {
       await this.prismaService.$disconnect();
     }
   }
+
+  async getSpecificGoal(id: string) {
+    try {
+      const foundGoal = await this.prismaService.goal.findUnique({
+        where: {
+          id: +id,
+        },
+        include: {
+          checklist: true,
+        },
+      });
+
+      if (foundGoal === null) {
+        throw new HttpException(`Goal not found!`, HttpStatus.NOT_FOUND, {
+          cause: new Error('No goal present on current database'),
+        });
+      }
+
+      return foundGoal;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
+  }
 }

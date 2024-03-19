@@ -39,4 +39,9 @@ export class GoalsController {
   async deleteSpecificGoal(@Param('id') id: string) {
     return await this.goalsService.deleteSpecificGoal(id);
   }
+
+  @Get('/specific/:id')
+  async getSpecificGoal(@Param('id') id: string) {
+    return await this.goalsService.getSpecificGoal(id);
+  }
 }

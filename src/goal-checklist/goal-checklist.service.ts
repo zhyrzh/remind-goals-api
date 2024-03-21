@@ -22,4 +22,28 @@ export class GoalChecklistService {
       );
     }
   }
+
+  async toggleIsActive(checklistItemId: string, isActive: string) {
+    console.log(checklistItemId, 'k');
+    try {
+      return await this.prismaService.goalChecklist.update({
+        where: {
+          id: +checklistItemId,
+        },
+        data: {
+          isActive: JSON.parse(isActive),
+        },
+      });
+    } catch (error) {
+      console.log(error, 'check error');
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

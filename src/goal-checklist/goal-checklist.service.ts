@@ -24,7 +24,6 @@ export class GoalChecklistService {
   }
 
   async toggleIsActive(checklistItemId: string, isActive: string) {
-    console.log(checklistItemId, 'k');
     try {
       return await this.prismaService.goalChecklist.update({
         where: {
@@ -35,7 +34,47 @@ export class GoalChecklistService {
         },
       });
     } catch (error) {
-      console.log(error, 'check error');
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async editTitle(checklistItemId: string, title: string) {
+    try {
+      return await this.prismaService.goalChecklist.update({
+        where: {
+          id: +checklistItemId,
+        },
+        data: {
+          title,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async deleteGoalChecklistItem(id: string) {
+    try {
+      return await this.prismaService.goalChecklist.delete({
+        where: {
+          id: +id,
+        },
+      });
+    } catch (error) {
       throw new HttpException(
         {
           reason: `Something went wrong when querying: ${

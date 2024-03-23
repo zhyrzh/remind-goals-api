@@ -22,6 +22,8 @@ model Reminder {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
+  User      User?     @relation(fields: [userId], references: [id])
+  userId    String?
 
   @@map("reminders")
 }
@@ -34,6 +36,8 @@ model Goal {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
+  User      User?     @relation(fields: [userId], references: [id])
+  userId    String?
 
   @@map("goals")
 }
@@ -48,6 +52,33 @@ model GoalChecklist {
   createdAt DateTime  @default(now())
   updatedAt DateTime?
   Goal      Goal?     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  User      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
 
   @@map("goal_checklist")
+}
+
+model User {
+  id String @id @unique
+
+  firstName String
+  lastName  String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+
+  goals           Goal[]
+  goalChecklist   GoalChecklist[]
+  reminder        Reminder[]
+  UserCredentials UserCredentials[]
+
+  @@map("users")
+}
+
+model UserCredentials {
+  email    String @id
+  password String
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }

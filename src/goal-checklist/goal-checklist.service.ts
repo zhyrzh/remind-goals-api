@@ -6,10 +6,13 @@ import { CreateGoalChecklistDTO } from './dto/create-goal-checklist.dto';
 export class GoalChecklistService {
   constructor(private prismaService: PrismaService) {}
 
-  async addGoalChecklist(body: CreateGoalChecklistDTO) {
+  async addGoalChecklist(body: CreateGoalChecklistDTO, user: string) {
     try {
       return await this.prismaService.goalChecklist.create({
-        data: body,
+        data: {
+          ...body,
+          userId: user,
+        },
       });
     } catch (error) {
       throw new HttpException(

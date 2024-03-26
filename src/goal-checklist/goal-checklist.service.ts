@@ -88,4 +88,28 @@ export class GoalChecklistService {
       );
     }
   }
+
+  async getAllNoGoalId(user: string) {
+    try {
+      return await this.prismaService.goalChecklist.findMany({
+        where: {
+          userId: user,
+          AND: {
+            goalId: {
+              equals: null,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

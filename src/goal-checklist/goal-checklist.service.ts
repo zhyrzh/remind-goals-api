@@ -112,4 +112,29 @@ export class GoalChecklistService {
       );
     }
   }
+
+  async deleteAllNoGoalId(user: string) {
+    try {
+      return await this.prismaService.goalChecklist.deleteMany({
+        where: {
+          userId: user,
+          AND: {
+            goalId: {
+              equals: null,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error, "sa'y error?");
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

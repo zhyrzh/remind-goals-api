@@ -2,11 +2,11 @@ import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
-  IsBoolean,
   IsNotEmpty,
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { GoalChecklistDTO } from './goalChecklist.dto';
 
 export class CreateGoalDTO {
   @IsNotEmpty()
@@ -21,16 +21,6 @@ export class CreateGoalDTO {
   @ArrayMinSize(1, {
     message: 'Checklist must be at least 1',
   })
-  @Type(() => GoalChecklist)
-  checklist: GoalChecklist[];
-}
-
-class GoalChecklist {
-  @IsNotEmpty()
-  @IsString()
-  title: string;
-
-  @IsNotEmpty()
-  @IsBoolean()
-  isActive: boolean;
+  @Type(() => GoalChecklistDTO)
+  checklist: GoalChecklistDTO[];
 }

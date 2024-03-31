@@ -1,9 +1,11 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateGoalChecklistDTO {
   @IsString()
+  @IsNotEmpty()
   title: string;
 
   @IsBoolean()
+  @IsNotEmpty()
   isActive: boolean;
 }

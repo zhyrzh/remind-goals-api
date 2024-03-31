@@ -58,4 +58,9 @@ export class GoalChecklistController {
   async getAllByUser(@User() user: string) {
     return this.goalChecklistService.getAllNoGoalId(user);
   }
+
+  @Delete('/all/no-goal-id')
+  async deleteAllNoGoalId(@User() user: string) {
+    return this.goalChecklistService.deleteAllNoGoalId(user);
+  }
 }

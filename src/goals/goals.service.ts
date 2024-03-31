@@ -48,17 +48,17 @@ export class GoalsService {
     }
   }
 
-  async getAllGoals(count: string, offset: string, title: string) {
+  async getAllGoals(params: { count: string; offset: string; title: string }) {
     try {
       return await this.prismaService.goal.findMany({
         include: {
           checklist: true,
         },
-        take: count ? +count : 10,
-        skip: offset ? +offset : 0,
+        take: params.count ? +params.count : 10,
+        skip: params.offset ? +params.offset : 0,
         where: {
           title: {
-            contains: title,
+            contains: params.title,
             mode: 'insensitive',
           },
         },

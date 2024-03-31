@@ -26,6 +26,31 @@ export class GoalChecklistService {
     }
   }
 
+  async addChecklistToExistingGoal(
+    body: CreateGoalChecklistDTO,
+    goalId: string,
+    user: string,
+  ) {
+    try {
+      return await this.prismaService.goalChecklist.create({
+        data: {
+          ...body,
+          userId: user,
+          goalId: +goalId,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   async toggleIsActive(checklistItemId: string, isActive: string) {
     try {
       return await this.prismaService.goalChecklist.update({
@@ -126,7 +151,26 @@ export class GoalChecklistService {
         },
       });
     } catch (error) {
-      console.log(error, "sa'y error?");
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async getAllByGoalId(user: string, goalId: string) {
+    try {
+      return await this.prismaService.goalChecklist.findMany({
+        where: {
+          userId: user,
+          goalId: +goalId,
+        },
+      });
+    } catch (error) {
       throw new HttpException(
         {
           reason: `Something went wrong when querying: ${

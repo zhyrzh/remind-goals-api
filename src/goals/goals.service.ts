@@ -8,16 +8,15 @@ import { EditGoalDTO } from './dto/editGoaTitlel.dto';
 export class GoalsService {
   constructor(private prismaService: PrismaService) {}
 
-  async addGoal(body: CreateGoalDTO) {
+  async addGoal(body: CreateGoalDTO, user: string) {
     try {
       return await this.prismaService.goal.create({
         data: {
           title: body.title,
           checklist: {
-            createMany: {
-              data: body.checklist,
-            },
+            connect: body.checklist.map((itm) => ({ id: itm.id })),
           },
+          userId: user,
         },
         include: {
           checklist: true,

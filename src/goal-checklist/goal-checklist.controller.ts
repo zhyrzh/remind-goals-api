@@ -1,7 +1,15 @@
-import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { GoalChecklistService } from './goal-checklist.service';
 import { CreateGoalChecklistDTO } from './dto/create-goal-checklist.dto';
-import { User } from 'src/auth/decorators/user.decorator';
+import { User } from '../auth/decorators/user.decorator';
 
 @Controller('goal-checklist')
 export class GoalChecklistController {
@@ -13,6 +21,19 @@ export class GoalChecklistController {
     @User() useremail: string,
   ) {
     return await this.goalChecklistService.addGoalChecklist(body, useremail);
+  }
+
+  @Post('/to-existing-goal/:goalId')
+  async addChecklistToExistingGoal(
+    @Body() body: CreateGoalChecklistDTO,
+    @Param('goalId') goalId: string,
+    @User() useremail: string,
+  ) {
+    return await this.goalChecklistService.addChecklistToExistingGoal(
+      body,
+      goalId,
+      useremail,
+    );
   }
 
   @Put('/toggle-is-active/:id/:isActive')
@@ -31,5 +52,10 @@ export class GoalChecklistController {
   @Delete('/:id')
   async deleteGoalChecklistItem(@Param('id') id: string) {
     return this.goalChecklistService.deleteGoalChecklistItem(id);
+  }
+
+  @Get('/get-all-no-goal-id')
+  async getAllByUser(@User() user: string) {
+    return this.goalChecklistService.getAllNoGoalId(user);
   }
 }

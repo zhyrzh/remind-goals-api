@@ -2,8 +2,10 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  NotAcceptableException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { RegisterUserDTO } from './dto/registerUser.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 
@@ -53,6 +55,28 @@ export class AuthService {
       }
 
       return user;
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async registerUser(body: RegisterUserDTO) {
+    try {
+      const user = await this.findOne(body.email);
+
+      if (user) {
+        throw new NotAcceptableException('User already exists');
+      }
+      return await this.prismaService.userCredentials.create({
+        data: body,
+      });
     } catch (error) {
       throw new HttpException(
         {

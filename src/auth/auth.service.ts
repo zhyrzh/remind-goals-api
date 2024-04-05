@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 
@@ -27,6 +32,27 @@ export class AuthService {
           user: false,
         },
       });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async validateUser(username: string, pass: string): Promise<any> {
+    try {
+      const user = await this.findOne(username);
+
+      if (!user || user.password !== pass) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      return user;
     } catch (error) {
       throw new HttpException(
         {

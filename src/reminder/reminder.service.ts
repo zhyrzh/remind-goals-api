@@ -22,4 +22,36 @@ export class ReminderService {
       );
     }
   }
+
+  async getAllReminder(
+    params: {
+      count: string;
+      offset: string;
+      content: string;
+    },
+    user: string,
+  ) {
+    try {
+      return await this.prismaService.reminder.findMany({
+        take: params.count ? +params.count : 10,
+        skip: params.offset ? +params.offset : 0,
+        where: {
+          content: {
+            contains: params.content,
+            mode: 'insensitive',
+          },
+          userId: user,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

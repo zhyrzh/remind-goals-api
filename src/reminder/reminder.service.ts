@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateReminderDTO } from './dto/createReminder.dto';
+import { EditReminderDetailsDTO } from './dto/editReminderDetails.dto';
 
 @Injectable()
 export class ReminderService {
@@ -60,6 +61,48 @@ export class ReminderService {
       return await this.prismaService.reminder.delete({
         where: {
           id,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta.details ? error.meta.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async editReminderDetails(body: EditReminderDetailsDTO, id: number) {
+    try {
+      return await this.prismaService.reminder.update({
+        where: {
+          id,
+        },
+        data: body,
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta.details ? error.meta.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async toggleIsActive(id: number, isActive: boolean) {
+    try {
+      return await this.prismaService.reminder.update({
+        where: {
+          id,
+        },
+        data: {
+          isActive,
         },
       });
     } catch (error) {

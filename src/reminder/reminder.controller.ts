@@ -6,10 +6,12 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ReminderService } from './reminder.service';
 import { CreateReminderDTO } from './dto/createReminder.dto';
+import { EditReminderDetailsDTO } from './dto/editReminderDetails.dto';
 import { User } from 'src/auth/decorators/user.decorator';
 
 @Controller('reminder')
@@ -41,5 +43,13 @@ export class ReminderController {
   @Delete('/:id')
   async deleteSpecificReminder(@Param('id', ParseIntPipe) id: number) {
     return await this.reminderService.deleteSpecificReminder(id);
+  }
+
+  @Put('/details/:id')
+  async editReminderDetails(
+    @Body() body: EditReminderDetailsDTO,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return await this.reminderService.editReminderDetails(body, id);
   }
 }

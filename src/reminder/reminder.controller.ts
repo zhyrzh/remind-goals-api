@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -51,5 +52,13 @@ export class ReminderController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return await this.reminderService.editReminderDetails(body, id);
+  }
+
+  @Put('/:id/:isActive')
+  async toggleIsActive(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('isActive', ParseBoolPipe) isActive: boolean,
+  ) {
+    return await this.reminderService.toggleIsActive(id, isActive);
   }
 }

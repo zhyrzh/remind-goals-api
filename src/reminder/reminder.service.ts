@@ -54,4 +54,23 @@ export class ReminderService {
       );
     }
   }
+
+  async deleteSpecificReminder(id: number) {
+    try {
+      return await this.prismaService.reminder.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta.details ? error.meta.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }

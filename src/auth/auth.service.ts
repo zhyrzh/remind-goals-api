@@ -74,18 +74,16 @@ export class AuthService {
       if (user) {
         throw new NotAcceptableException('User already exists');
       }
-      return await this.prismaService.userCredentials.create({
+      const createdUser = await this.prismaService.userCredentials.create({
         data: body,
       });
+
+      const payload = { username: createdUser.email, sub: createdUser.email };
+      return {
+        access_token: this.jwtService.sign(payload),
+      };
     } catch (error) {
-      throw new HttpException(
-        {
-          reason: `Something went wrong when querying: ${
-            error.meta?.details ? error.meta?.details : error
-          }`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
 }

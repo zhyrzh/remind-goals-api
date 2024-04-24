@@ -47,6 +47,28 @@ export class AuthService {
     }
   }
 
+  async findOneFacebookId(id: string) {
+    try {
+      return await this.prismaService.userCredentials.findUnique({
+        where: {
+          facebookId: id,
+        },
+        include: {
+          user: true,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   async validateUser(username: string, pass: string): Promise<any> {
     try {
       const user = await this.findOne(username);

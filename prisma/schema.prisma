@@ -16,9 +16,10 @@ datasource db {
 model Reminder {
   id Int @id @default(autoincrement())
 
-  content  String
-  isActive Boolean
-  frequncy String
+  content           String
+  isActive          Boolean
+  frequency         String
+  reminderStartDate DateTime
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
@@ -76,8 +77,10 @@ model User {
 }
 
 model UserCredentials {
-  email    String @id
-  password String
+  email    String  @id
+  password String?
+
+  facebookId String? @unique
 
   user   User?   @relation(fields: [userId], references: [id])
   userId String?

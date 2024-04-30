@@ -6,17 +6,25 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategy/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { FacebookSignupStrategy } from './strategy/facebook-signup.strategy';
+import { FacebookLoginStrategy } from './strategy/facebook-login.strategy';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
     JwtModule.register({
-      secret: `jwtConstants.secret`,
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    FacebookSignupStrategy,
+    FacebookLoginStrategy,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

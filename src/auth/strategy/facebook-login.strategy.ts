@@ -15,9 +15,9 @@ export class FacebookLoginStrategy extends PassportStrategy(
     private jwtService: JwtService,
   ) {
     super({
-      clientID: '948452230274802',
-      clientSecret: '53db37ba90999420d8b7244dec2393a4',
-      callbackURL: `http://localhost:5000/auth/facebook/login/redirect`,
+      clientID: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_SECRET,
+      callbackURL: process.env.FACEBOOK_SIGNUP_CB_URL,
       scope: 'email',
       profileFields: ['emails', 'first_name', 'gender', 'last_name', 'picture'],
       passReqToCallback: true,
@@ -33,7 +33,6 @@ export class FacebookLoginStrategy extends PassportStrategy(
     done: (err: any, user: any, info?: any) => void,
   ): Promise<any> {
     try {
-      console.log('login strat');
       const { id } = profile;
 
       const foundUser = await this.authService.findOneFacebookId(id);
@@ -60,9 +59,5 @@ export class FacebookLoginStrategy extends PassportStrategy(
         HttpStatus.BAD_REQUEST,
       );
     }
-  }
-
-  error(err: any): void {
-    console.log(err, 'check error');
   }
 }

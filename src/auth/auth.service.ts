@@ -32,7 +32,7 @@ export class AuthService {
           email: username,
         },
         include: {
-          user: false,
+          user: true,
         },
       });
     } catch (error) {

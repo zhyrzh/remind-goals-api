@@ -7,10 +7,13 @@ import { EditReminderDetailsDTO } from './dto/editReminderDetails.dto';
 export class ReminderService {
   constructor(private prismaService: PrismaService) {}
 
-  async createReminder(body: CreateReminderDTO) {
+  async createReminder(user: string, body: CreateReminderDTO) {
     try {
       return await this.prismaService.reminder.create({
-        data: body,
+        data: {
+          ...body,
+          userId: user,
+        },
       });
     } catch (error) {
       throw new HttpException(

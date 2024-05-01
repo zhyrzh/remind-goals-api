@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SetupProfileDTO } from './dto/setupProfile.dto';
 import { User } from 'src/auth/decorators/user.decorator';
@@ -10,5 +10,10 @@ export class UsersController {
   @Post('/setup-profile')
   async setupProfile(@Body() body: SetupProfileDTO, @User() userEmail: string) {
     return await this.usersService.setupProfile(body, userEmail);
+  }
+
+  @Get('/')
+  async getUserInfo(@User() user: string) {
+    return await this.usersService.getUserInfo(user);
   }
 }

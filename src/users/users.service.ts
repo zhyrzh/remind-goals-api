@@ -6,11 +6,38 @@ import { SetupProfileDTO } from './dto/setupProfile.dto';
 export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
-  async setupProfile(data: SetupProfileDTO, user: string) {
+  async setupProfile(profileData: SetupProfileDTO, user: string) {
     try {
-      return this.prismaService.user.create({
+      const data = await this.prismaService.userCredentials.update({
+        where: {
+          email: user,
+        },
         data: {
-          ...data,
+          user: {
+            create: {
+              ...profileData,
+              id: user,
+            },
+          },
+        },
+      });
+      return data;
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async getUserInfo(user: string) {
+    try {
+      return this.prismaService.user.findUnique({
+        where: {
           id: user,
         },
       });

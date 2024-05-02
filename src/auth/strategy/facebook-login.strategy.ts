@@ -17,7 +17,7 @@ export class FacebookLoginStrategy extends PassportStrategy(
     super({
       clientID: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_SECRET,
-      callbackURL: process.env.FACEBOOK_SIGNUP_CB_URL,
+      callbackURL: process.env.FACEBOOK_LOGIN_CB_URL,
       scope: 'email',
       profileFields: ['emails', 'first_name', 'gender', 'last_name', 'picture'],
       passReqToCallback: true,

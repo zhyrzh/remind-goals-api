@@ -4,14 +4,16 @@ import {
   Get,
   HttpStatus,
   Post,
+  Req,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDTO } from './dto/registerUser.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/public.decorator';
-
+import { Response } from 'express';
 import { FacebookLoginAuthGuard } from './guards/facebook-login.guard';
 
 @Controller('auth')
@@ -36,5 +38,16 @@ export class AuthController {
   @UseGuards(FacebookLoginAuthGuard)
   async facebookLogin() {
     return HttpStatus.OK;
+  }
+
+  @Public()
+  @Get('/facebook/login/redirect')
+  @UseGuards(FacebookLoginAuthGuard)
+  async facebookLoginRedirect(
+    @Req() req: Request,
+    @Res() response: Response,
+  ): Promise<any> {
+    response.cookie('my-key', req['user']);
+    return response.redirect('http://localhost:3000/login');
   }
 }

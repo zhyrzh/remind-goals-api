@@ -58,4 +58,15 @@ export class AuthController {
   async facebookSignup() {
     return HttpStatus.OK;
   }
+
+  @Public()
+  @UseGuards(FacebookSignupAuthGuard)
+  @Get('/facebook/signup/redirect')
+  async facebookSignupRedirect(
+    @Req() req: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<any> {
+    response.cookie('my-key', req['user']);
+    return response.redirect('http://localhost:3000/login');
+  }
 }

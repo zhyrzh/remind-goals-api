@@ -15,6 +15,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { Response } from 'express';
 import { FacebookLoginAuthGuard } from './guards/facebook-login.guard';
+import { FacebookSignupAuthGuard } from './guards/facebook-signup.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -49,5 +50,12 @@ export class AuthController {
   ): Promise<any> {
     response.cookie('my-key', req['user']);
     return response.redirect('http://localhost:3000/login');
+  }
+
+  @Public()
+  @UseGuards(FacebookSignupAuthGuard)
+  @Get('/signup/facebook')
+  async facebookSignup() {
+    return HttpStatus.OK;
   }
 }

@@ -2,10 +2,17 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateReminderDTO } from './dto/createReminder.dto';
 import { EditReminderDetailsDTO } from './dto/editReminderDetails.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import * as dayjs from 'dayjs';
+import { Reminder } from '@prisma/client';
 
 @Injectable()
 export class ReminderService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private mailerService: MailerService,
+  ) {}
 
   async createReminder(user: string, body: CreateReminderDTO) {
     try {
@@ -113,6 +120,66 @@ export class ReminderService {
         {
           reason: `Something went wrong when querying: ${
             error.meta.details ? error.meta.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  async sendNotification() {
+    try {
+      const usersWithRemindersToday: { user: string; reminders: Reminder[] }[] =
+        [];
+
+      // get all reminders that needs to be delivered today
+      const reminders = await this.prismaService.reminder.findMany({
+        where: {
+          AND: [
+            {
+              reminderStartDate: {
+                gte: new Date(
+                  `${dayjs().format('YYYY-MM-DD').toString()} 00:00:00`,
+                ),
+              },
+            },
+            {
+              reminderStartDate: {
+                lte: new Date(
+                  `${dayjs().format('YYYY-MM-DD').toString()} 23:59:59`,
+                ),
+              },
+            },
+          ],
+        },
+      });
+
+      // Arranged each item by user
+      for (let i = 0; i <= reminders.length - 1; i++) {
+        if (
+          usersWithRemindersToday.filter(
+            (itm) => itm.user === reminders[i].userId,
+          ).length === 0
+        ) {
+          usersWithRemindersToday.push({
+            user: reminders[i].userId,
+            reminders: [{ ...reminders[i] }],
+          });
+        } else {
+          usersWithRemindersToday.map((itm) =>
+            itm.user === reminders[i].userId
+              ? { ...itm, reminders: itm.reminders.push({ ...reminders[i] }) }
+              : itm,
+          );
+        }
+      }
+      console.log(usersWithRemindersToday[1]);
+    } catch (error) {
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
           }`,
         },
         HttpStatus.BAD_REQUEST,

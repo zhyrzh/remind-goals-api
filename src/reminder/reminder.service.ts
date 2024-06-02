@@ -174,7 +174,15 @@ export class ReminderService {
           );
         }
       }
-      console.log(usersWithRemindersToday[1]);
+
+      usersWithRemindersToday.forEach(async (itm) => {
+        await this.mailerService.sendMail({
+          to: itm.user,
+          from: '"RemindGoals App" <remindgoals@gmail.com>', // override default from
+          subject: 'You have reminders to be addressed today',
+          html: `You have ${itm.reminders.length} that needs your attention`,
+        });
+      });
     } catch (error) {
       throw new HttpException(
         {

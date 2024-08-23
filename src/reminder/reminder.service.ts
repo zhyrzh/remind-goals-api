@@ -127,7 +127,7 @@ export class ReminderService {
     }
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async sendNotification() {
     try {
       const usersWithRemindersToday: { user: string; reminders: Reminder[] }[] =

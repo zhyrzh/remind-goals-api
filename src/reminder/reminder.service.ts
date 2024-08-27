@@ -130,8 +130,11 @@ export class ReminderService {
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async sendNotification() {
     try {
-      const usersWithRemindersToday: { user: string; reminders: Reminder[] }[] =
-        [];
+      const usersWithRemindersToday: {
+        user: string;
+        firstName: string;
+        reminders: Reminder[];
+      }[] = [];
 
       // get all reminders that needs to be delivered today
       const reminders = await this.prismaService.reminder.findMany({
@@ -151,7 +154,17 @@ export class ReminderService {
                 ),
               },
             },
+            {
+              isActive: true,
+            },
           ],
+        },
+        include: {
+          User: {
+            select: {
+              firstName: true,
+            },
+          },
         },
       });
 
@@ -164,6 +177,7 @@ export class ReminderService {
         ) {
           usersWithRemindersToday.push({
             user: reminders[i].userId,
+            firstName: reminders[i].User.firstName,
             reminders: [{ ...reminders[i] }],
           });
         } else {
@@ -180,7 +194,13 @@ export class ReminderService {
           to: itm.user,
           from: '"RemindGoals App" <remindgoals@gmail.com>', // override default from
           subject: 'You have reminders to be addressed today',
-          html: `You have ${itm.reminders.length} that needs your attention`,
+          // html: `You have ${itm.reminders.length} that needs your attention`,
+          context: {
+            user: itm.user,
+            fName: itm.firstName,
+            reminders: itm.reminders,
+          },
+          template: process.cwd() + '/src/mailer/template/notification',
         });
       });
     } catch (error) {

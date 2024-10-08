@@ -14,9 +14,15 @@ export class UsersService {
         },
         data: {
           user: {
-            create: {
-              ...profileData,
-              id: user,
+            connectOrCreate: {
+              where: {
+                id: user,
+              },
+              create: {
+                firstName: profileData.firstName,
+                lastName: profileData.lastName,
+                id: user,
+              },
             },
           },
         },

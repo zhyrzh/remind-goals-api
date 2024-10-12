@@ -7,7 +7,6 @@ import * as path from 'path';
   imports: [
     Mailer.forRoot({
       transport: {
-        service: process.env.MAILER_SERVICE,
         host: process.env.MAILER_HOST,
         port: 587,
         secure: false,

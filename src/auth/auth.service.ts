@@ -8,6 +8,7 @@ import {
 import { RegisterUserDTO } from './dto/registerUser.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -73,7 +74,9 @@ export class AuthService {
     try {
       const { password, ...user } = await this.findOne(username);
 
-      if (!user || password !== pass) {
+      const isPasswordValid = await bcrypt.compare(pass, password);
+
+      if (!user || isPasswordValid) {
         throw new UnauthorizedException('Invalid credentials');
       }
 
@@ -97,10 +100,14 @@ export class AuthService {
       if (user) {
         throw new NotAcceptableException('User already exists');
       }
+
+      const hashedPassword = await bcrypt.hash(body.password, 97);
+
       const createdUser = await this.prismaService.userCredentials.create({
         data: {
           ...body,
           userId: body.email,
+          password: hashedPassword,
         },
       });
 

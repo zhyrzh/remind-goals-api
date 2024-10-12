@@ -71,9 +71,9 @@ export class AuthService {
 
   async validateUser(username: string, pass: string): Promise<any> {
     try {
-      const user = await this.findOne(username);
+      const { password, ...user } = await this.findOne(username);
 
-      if (!user || user.password !== pass) {
+      if (!user || password !== pass) {
         throw new UnauthorizedException('Invalid credentials');
       }
 
@@ -92,21 +92,33 @@ export class AuthService {
 
   async registerUser(body: RegisterUserDTO) {
     try {
-      const user = await this.findOne(body.email);
+      const { password, ...user } = await this.findOne(body.email);
 
       if (user) {
         throw new NotAcceptableException('User already exists');
       }
       const createdUser = await this.prismaService.userCredentials.create({
-        data: body,
+        data: {
+          ...body,
+          userId: body.email,
+        },
       });
 
       const payload = { username: createdUser.email, sub: createdUser.email };
+
       return {
         access_token: this.jwtService.sign(payload),
+        profile: user,
       };
     } catch (error) {
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta?.details ? error.meta?.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

@@ -8,7 +8,7 @@ import {
 import { RegisterUserDTO } from './dto/registerUser.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -72,15 +72,21 @@ export class AuthService {
 
   async validateUser(username: string, pass: string): Promise<any> {
     try {
-      const { password, ...user } = await this.findOne(username);
+      const user = await this.findOne(username);
 
-      const isPasswordValid = await bcrypt.compare(pass, password);
-
-      if (!user || isPasswordValid) {
+      if (!user) {
         throw new UnauthorizedException('Invalid credentials');
       }
 
-      return user;
+      const { password, ...otherDetails } = user;
+
+      const isPasswordValid = await bcrypt.compare(pass, password);
+
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      return otherDetails;
     } catch (error) {
       throw new HttpException(
         {
@@ -95,19 +101,19 @@ export class AuthService {
 
   async registerUser(body: RegisterUserDTO) {
     try {
-      const { password, ...user } = await this.findOne(body.email);
+      const user = await this.findOne(body.email);
 
-      if (user) {
+      if (user !== null) {
         throw new NotAcceptableException('User already exists');
       }
 
-      const hashedPassword = await bcrypt.hash(body.password, 97);
+      const saltRnds = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(body.password, saltRnds);
 
       const createdUser = await this.prismaService.userCredentials.create({
         data: {
-          ...body,
-          userId: body.email,
           password: hashedPassword,
+          email: body.email,
         },
       });
 

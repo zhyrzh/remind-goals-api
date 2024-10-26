@@ -16,10 +16,16 @@ import { Public } from './decorators/public.decorator';
 import { Response } from 'express';
 import { FacebookLoginAuthGuard } from './guards/facebook-login.guard';
 import { FacebookSignupAuthGuard } from './guards/facebook-signup.guard';
+import { User } from './decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Get('/verify-user/')
+  async verifyUser(@User() email: string) {
+    return await this.authService.findOne(email);
+  }
 
   @Public()
   @UseGuards(LocalAuthGuard)

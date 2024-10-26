@@ -48,7 +48,10 @@ export class GoalsService {
     }
   }
 
-  async getAllGoals(params: { count: string; offset: string; title: string }) {
+  async getAllGoals(
+    params: { count: string; offset: string; title: string },
+    user: string,
+  ) {
     try {
       return await this.prismaService.goal.findMany({
         include: {
@@ -61,6 +64,7 @@ export class GoalsService {
             contains: params.title,
             mode: 'insensitive',
           },
+          userId: user,
         },
       });
     } catch (error) {

@@ -32,8 +32,9 @@ export class GoalsController {
     @Query('count') count: string,
     @Query('offset') offset: string,
     @Query('title') title: string,
+    @User() user: string,
   ) {
-    return await this.goalsService.getAllGoals({ count, offset, title });
+    return await this.goalsService.getAllGoals({ count, offset, title }, user);
   }
 
   @Delete('/:id')

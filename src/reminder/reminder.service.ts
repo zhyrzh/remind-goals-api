@@ -127,6 +127,52 @@ export class ReminderService {
     }
   }
 
+  async adjustTriggerDate(reminder: Reminder) {
+    let adjustedDate;
+    switch (reminder.frequency) {
+      case FrequencyEnum.once:
+        adjustedDate = reminder.reminderStartDate;
+        break;
+      case FrequencyEnum.daily:
+        adjustedDate = dayjs(reminder.reminderStartDate)
+          .add(1, 'day')
+          .format('MM/DD/YYYY HH:mm');
+        break;
+      case FrequencyEnum.weekly:
+        const dayPosition = 9 - dayjs(reminder.reminderStartDate).get('day');
+        adjustedDate = dayjs(reminder.reminderStartDate)
+          .add(dayPosition, 'days')
+          .format('MM/DD/YYYY HH:mm');
+        break;
+      case FrequencyEnum.monthly:
+        adjustedDate = dayjs(reminder.reminderStartDate)
+          .add(1, 'month')
+          .format('MM/DD/YYYY HH:mm');
+        break;
+      case FrequencyEnum.annually:
+        adjustedDate = dayjs(reminder.reminderStartDate)
+          .add(1, 'year')
+          .format('MM/DD/YYYY HH:mm');
+        break;
+      default:
+        break;
+    }
+
+    try {
+      console.log(adjustedDate, 'check adjusted date');
+      await this.prismaService.reminder.update({
+        where: {
+          id: reminder.id,
+        },
+        data: {
+          reminderStartDate: new Date(adjustedDate),
+        },
+      });
+    } catch (error) {
+      console.log(error, 'check error');
+    }
+  }
+
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async sendNotification() {
     try {
@@ -205,60 +251,9 @@ export class ReminderService {
         });
       });
 
-      reminders.forEach(this.adjustTriggerDate);
-    } catch (error) {
-      throw new HttpException(
-        {
-          reason: `Something went wrong when querying: ${
-            error.meta?.details ? error.meta?.details : error
-          }`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  async adjustTriggerDate(reminder: Reminder) {
-    let adjustedDate;
-    switch (reminder.frequency) {
-      case FrequencyEnum.once:
-        adjustedDate = reminder.reminderStartDate;
-        break;
-      case FrequencyEnum.daily:
-        adjustedDate = dayjs(reminder.reminderStartDate)
-          .add(1, 'day')
-          .format('MM/DD/YYYY HH:mm');
-        break;
-      case FrequencyEnum.weekly:
-        const dayPosition = 9 - dayjs(reminder.reminderStartDate).get('day');
-        adjustedDate = dayjs(reminder.reminderStartDate)
-          .add(dayPosition)
-          .add(7, 'days')
-          .format('MM/DD/YYYY HH:mm');
-        break;
-      case FrequencyEnum.monthly:
-        adjustedDate = dayjs(reminder.reminderStartDate)
-          .add(1, 'month')
-          .format('MM/DD/YYYY HH:mm');
-        break;
-      case FrequencyEnum.annually:
-        adjustedDate = dayjs(reminder.reminderStartDate)
-          .add(1, 'year')
-          .format('MM/DD/YYYY HH:mm');
-        break;
-      default:
-        break;
-    }
-
-    try {
-      await this.prismaService.reminder.update({
-        where: {
-          id: reminder.id,
-        },
-        data: {
-          reminderStartDate: adjustedDate,
-        },
-      });
+      for (const itm of reminders) {
+        this.adjustTriggerDate(itm);
+      }
     } catch (error) {
       throw new HttpException(
         {

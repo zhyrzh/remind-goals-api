@@ -230,7 +230,7 @@ export class ReminderService {
           .format('MM/DD/YYYY HH:mm');
         break;
       case FrequencyEnum.weekly:
-        const dayPosition = 8 - dayjs(reminder.reminderStartDate).get('day');
+        const dayPosition = 9 - dayjs(reminder.reminderStartDate).get('day');
         adjustedDate = dayjs(reminder.reminderStartDate)
           .add(dayPosition)
           .add(7, 'days')

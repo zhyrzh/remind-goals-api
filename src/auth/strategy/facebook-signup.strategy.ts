@@ -36,6 +36,7 @@ export class FacebookSignupStrategy extends PassportStrategy(
       const { emails, id: facebookId } = profile;
 
       const foundUser = await this.authService.findOne(emails[0].value);
+      console.log(foundUser, 'check found user');
       if (foundUser) {
         return done(null, {
           message:
@@ -64,7 +65,7 @@ export class FacebookSignupStrategy extends PassportStrategy(
 
       const access_token = this.jwtService.sign(payload);
 
-      return done(null, { access_token });
+      return done(null, { access_token, profile: registeredUser });
     } catch (error) {
       throw new HttpException(
         {

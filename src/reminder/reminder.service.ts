@@ -139,10 +139,19 @@ export class ReminderService {
           .format('MM/DD/YYYY HH:mm');
         break;
       case FrequencyEnum.weekly:
-        const dayPosition = 9 - dayjs(reminder.reminderStartDate).get('day');
-        adjustedDate = dayjs(reminder.reminderStartDate)
-          .add(dayPosition, 'days')
-          .format('MM/DD/YYYY HH:mm');
+        const dayPosition = dayjs(reminder.reminderStartDate).get('day');
+        if (dayPosition === 0) {
+          adjustedDate = dayjs(reminder.reminderStartDate)
+            .add(1, 'day')
+            .format('MM/DD/YYYY HH:mm');
+        } else {
+          const daysToMonday =
+            7 - (dayjs(reminder.reminderStartDate).get('day') + 1) + 2;
+          adjustedDate = dayjs(reminder.reminderStartDate)
+            .add(daysToMonday, 'days')
+            .format('MM/DD/YYYY HH:mm');
+        }
+
         break;
       case FrequencyEnum.monthly:
         adjustedDate = dayjs(reminder.reminderStartDate)

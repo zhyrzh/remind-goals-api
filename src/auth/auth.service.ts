@@ -75,7 +75,7 @@ export class AuthService {
       const user = await this.findOne(username);
 
       if (!user) {
-        throw new UnauthorizedException('Invalid credentials');
+        return new UnauthorizedException('Invalid credentials');
       }
 
       const { password, ...otherDetails } = user;
@@ -83,7 +83,7 @@ export class AuthService {
       const isPasswordValid = await bcrypt.compare(pass, password);
 
       if (!isPasswordValid) {
-        throw new UnauthorizedException('Invalid credentials');
+        return new UnauthorizedException('Invalid credentials');
       }
 
       return otherDetails;
@@ -104,7 +104,7 @@ export class AuthService {
       const user = await this.findOne(body.email);
 
       if (user !== null) {
-        throw new NotAcceptableException('User already exists');
+        return new NotAcceptableException('User already exists');
       }
 
       const saltRnds = await bcrypt.genSalt();

@@ -246,6 +246,7 @@ export class ReminderService {
       }
 
       usersWithRemindersToday.forEach(async (itm) => {
+        console.log('TRIGGERED', itm.user);
         await this.mailerService.sendMail({
           to: itm.user,
           from: '"RemindGoals App" <remindgoals@gmail.com>', // override default from

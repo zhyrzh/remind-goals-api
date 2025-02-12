@@ -48,7 +48,7 @@ export class AuthController {
   }
 
   @Public()
-  @Get('/facebook/login/redirect')
+  @Get('/facebook-login-redirect')
   @UseGuards(FacebookLoginAuthGuard)
   async facebookLoginRedirect(
     @Req() req: Request,
@@ -67,7 +67,7 @@ export class AuthController {
 
   @Public()
   @UseGuards(FacebookSignupAuthGuard)
-  @Get('/facebook/signup/redirect')
+  @Get('/facebook-signup-redirect')
   async facebookSignupRedirect(
     @Req() req: Request,
     @Res({ passthrough: true }) response: Response,

@@ -55,7 +55,7 @@ export class AuthController {
     @Res() response: Response,
   ): Promise<any> {
     response.cookie('my-key', req['user']);
-    return response.redirect('http://localhost:3000/login');
+    return response.redirect('https://remind-goals-client.onrender.com/login');
   }
 
   @Public()
@@ -73,6 +73,6 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<any> {
     response.cookie('my-key', req['user']);
-    return response.redirect('http://localhost:3000/signup');
+    return response.redirect('https://remind-goals-client.onrender.com/signup');
   }
 }

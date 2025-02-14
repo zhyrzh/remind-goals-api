@@ -54,10 +54,7 @@ export class AuthController {
     @Req() req: Request,
     @Res() response: Response,
   ): Promise<any> {
-    response.cookie('my-key', req['user'], {
-      sameSite: 'none',
-      secure: true,
-    });
+    response.cookie('my-key', req['user']);
     return response.redirect(`${process.env.FRONTEND_URL}/login`);
   }
 
@@ -75,10 +72,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<any> {
-    response.cookie('my-key', req['user'], {
-      sameSite: 'none',
-      secure: true,
-    });
+    response.cookie('my-key', req['user']);
     return response.redirect(`${process.env.FRONTEND_URL}/signup`);
   }
 }

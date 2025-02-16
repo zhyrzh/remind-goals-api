@@ -8,7 +8,7 @@ async function bootstrap() {
     cors: {
       origin: [process.env.FRONTEND_URL],
       credentials: true,
-      allowedHeaders: '*',
+      allowedHeaders: ['Content-Type', 'Authorization'],
     },
   });
   app.use(cookieParser());

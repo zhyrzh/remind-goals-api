@@ -57,7 +57,7 @@ export class AuthController {
     response.cookie('my-key', req['user'], {
       httpOnly: false,
       sameSite: true,
-      domain: process.env.FRONTEND_URL,
+      domain: 'onrender.com',
     });
     return response.redirect(`${process.env.FRONTEND_URL}/login`);
   }
@@ -79,7 +79,7 @@ export class AuthController {
     response.cookie('my-key', req['user'], {
       httpOnly: false,
       sameSite: true,
-      domain: process.env.FRONTEND_URL,
+      domain: 'onrender.com',
     });
     return response.redirect(`${process.env.FRONTEND_URL}/signup`);
   }

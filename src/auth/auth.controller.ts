@@ -54,11 +54,7 @@ export class AuthController {
     @Req() req: Request,
     @Res() response: Response,
   ): Promise<any> {
-    response.cookie('my-key', req['user'], {
-      httpOnly: false,
-      sameSite: true,
-      domain: 'onrender.com',
-    });
+    response.cookie('my-key', req['user']);
     return response.redirect(`${process.env.FRONTEND_URL}/login`);
   }
 
@@ -76,11 +72,7 @@ export class AuthController {
     @Req() req: Request,
     @Res() response: Response,
   ): Promise<any> {
-    response.cookie('my-key', req['user'], {
-      httpOnly: false,
-      sameSite: true,
-      domain: 'onrender.com',
-    });
+    response.cookie('my-key', req['user']);
     return response.redirect(`${process.env.FRONTEND_URL}/signup`);
   }
 }

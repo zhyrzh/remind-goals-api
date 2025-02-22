@@ -5,7 +5,23 @@ import { EditReminderDetailsDTO } from './dto/editReminderDetails.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import * as dayjs from 'dayjs';
-import { Reminder } from '@prisma/client';
+import { Prisma, Reminder } from '@prisma/client';
+
+interface IReminderEmailContent {
+  user: string;
+  firstName: string;
+  reminders: Reminder[];
+}
+
+type IReminderWithUser = Prisma.ReminderGetPayload<{
+  include: {
+    User: {
+      select: {
+        firstName;
+      };
+    };
+  };
+}>;
 
 @Injectable()
 export class ReminderService {
@@ -183,14 +199,8 @@ export class ReminderService {
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async sendNotification() {
+  async dailyReminderScheduler() {
     try {
-      const usersWithRemindersToday: {
-        user: string;
-        firstName: string;
-        reminders: Reminder[];
-      }[] = [];
-
       // get all reminders that needs to be delivered today
       const reminders = await this.prismaService.reminder.findMany({
         where: {
@@ -223,43 +233,10 @@ export class ReminderService {
         },
       });
 
-      // Arranged each item by user
-      for (let i = 0; i <= reminders.length - 1; i++) {
-        const addedUser =
-          usersWithRemindersToday.filter(
-            (itm) => itm.user === reminders[i].userId,
-          ).length === 0;
+      const usersWithRemindersToday =
+        await this.transformToReminderEmailItemHandler(reminders);
 
-        if (addedUser) {
-          usersWithRemindersToday.push({
-            user: reminders[i].userId,
-            firstName: reminders[i].User.firstName,
-            reminders: [{ ...reminders[i] }],
-          });
-        } else {
-          usersWithRemindersToday.map((itm) =>
-            itm.user === reminders[i].userId
-              ? { ...itm, reminders: itm.reminders.push({ ...reminders[i] }) }
-              : itm,
-          );
-        }
-      }
-
-      usersWithRemindersToday.forEach(async (itm) => {
-        console.log('TRIGGERED', itm.user);
-        await this.mailerService.sendMail({
-          to: itm.user,
-          from: '"RemindGoals App" <remindgoals@gmail.com>', // override default from
-          subject: 'You have reminders to be addressed today',
-          // html: `You have ${itm.reminders.length} that needs your attention`,
-          context: {
-            user: itm.user,
-            fName: itm.firstName,
-            reminders: itm.reminders,
-          },
-          template: process.cwd() + '/src/mailer/template/notification',
-        });
-      });
+      usersWithRemindersToday.forEach(this.sendReminderEmail);
 
       for (const itm of reminders) {
         this.adjustTriggerDate(itm);
@@ -274,5 +251,50 @@ export class ReminderService {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  async sendReminderEmail(content: IReminderEmailContent) {
+    await this.mailerService.sendMail({
+      to: content.user,
+      from: '"RemindGoals App" <remindgoals@gmail.com>', // override default from
+      subject: 'You have reminders to be addressed today',
+      // html: `You have ${itm.reminders.length} that needs your attention`,
+      context: {
+        user: content.user,
+        fName: content.firstName,
+        reminders: content.reminders,
+      },
+      template: process.cwd() + '/src/mailer/template/notification',
+    });
+  }
+
+  async transformToReminderEmailItemHandler(
+    reminders: IReminderWithUser[],
+  ): Promise<IReminderEmailContent[]> {
+    const usersWithRemindersToday: IReminderEmailContent[] = [];
+
+    // Arranged each item by user
+    for (let i = 0; i <= reminders.length - 1; i++) {
+      const addedUser =
+        usersWithRemindersToday.filter(
+          (itm) => itm.user === reminders[i].userId,
+        ).length === 0;
+
+      if (addedUser) {
+        usersWithRemindersToday.push({
+          user: reminders[i].userId,
+          firstName: reminders[i].User.firstName,
+          reminders: [{ ...reminders[i] }],
+        });
+      } else {
+        usersWithRemindersToday.map((itm) =>
+          itm.user === reminders[i].userId
+            ? { ...itm, reminders: itm.reminders.push({ ...reminders[i] }) }
+            : itm,
+        );
+      }
+    }
+
+    return usersWithRemindersToday;
   }
 }

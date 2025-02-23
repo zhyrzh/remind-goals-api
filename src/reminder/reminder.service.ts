@@ -32,12 +32,30 @@ export class ReminderService {
 
   async createReminder(user: string, body: CreateReminderDTO) {
     try {
-      return await this.prismaService.reminder.create({
+      const data = await this.prismaService.reminder.create({
         data: {
           ...body,
           userId: user,
         },
+        include: {
+          User: {
+            select: {
+              firstName: true,
+            },
+          },
+        },
       });
+
+      // converted contents ready to be sent on users email after created
+      const reminderEmlContent = await this.transformToReminderEmailItemHandler(
+        [data],
+      );
+
+      // email sending
+      reminderEmlContent.forEach(this.sendReminderEmail);
+
+      // modified return data to not include user information
+      return data;
     } catch (error) {
       throw new HttpException(
         {

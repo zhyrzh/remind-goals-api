@@ -184,7 +184,6 @@ export class ReminderService {
     }
 
     try {
-      console.log(adjustedDate, 'check adjusted date');
       await this.prismaService.reminder.update({
         where: {
           id: reminder.id,
@@ -194,7 +193,14 @@ export class ReminderService {
         },
       });
     } catch (error) {
-      console.log(error, 'check error');
+      throw new HttpException(
+        {
+          reason: `Something went wrong when querying: ${
+            error.meta.details ? error.meta.details : error
+          }`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 

@@ -19,7 +19,7 @@ model Reminder {
   content           String
   isActive          Boolean
   frequency         String
-  reminderStartDate DateTime
+  triggerDate DateTime
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
@@ -84,4 +84,6 @@ model UserCredentials {
 
   user   User?   @relation(fields: [userId], references: [id])
   userId String?
+
+  @@map("user_credentials")
 }

@@ -55,7 +55,7 @@ export class ReminderService {
       reminderEmlContent.forEach(this.sendReminderEmail);
 
       // modified return data to not include user information
-      return data;
+      return { ...data, User: undefined };
     } catch (error) {
       throw new HttpException(
         {

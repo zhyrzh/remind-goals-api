@@ -52,7 +52,7 @@ export class ReminderService {
       );
 
       // email sending
-      reminderEmlContent.forEach(this.sendReminderEmail);
+      await this.sendReminderEmail(reminderEmlContent);
 
       // modified return data to not include user information
       return { ...data, User: undefined };
@@ -260,7 +260,7 @@ export class ReminderService {
       const usersWithRemindersToday =
         await this.transformToReminderEmailItemHandler(reminders);
 
-      usersWithRemindersToday.forEach(this.sendReminderEmail);
+      await this.sendReminderEmail(usersWithRemindersToday);
 
       for (const itm of reminders) {
         this.adjustTriggerDate(itm);
@@ -277,19 +277,25 @@ export class ReminderService {
     }
   }
 
-  async sendReminderEmail(content: IReminderEmailContent) {
-    await this.mailerService.sendMail({
-      to: content.user,
-      from: '"RemindGoals App" <remindgoals@gmail.com>', // override default from
-      subject: 'You have reminders to be addressed today',
-      // html: `You have ${itm.reminders.length} that needs your attention`,
-      context: {
-        user: content.user,
-        fName: content.firstName,
-        reminders: content.reminders,
-      },
-      template: process.cwd() + '/src/mailer/template/notification',
-    });
+  async sendReminderEmail(reminders: IReminderEmailContent[]) {
+    for (const rmndr of reminders) {
+      try {
+        await this.mailerService.sendMail({
+          to: rmndr.user,
+          from: '"RemindGoals App" <remindgoals@gmail.com>', // override default from
+          subject: 'You have reminders to be addressed today',
+          // html: `You have ${itm.reminders.length} that needs your attention`,
+          context: {
+            user: rmndr.user,
+            fName: rmndr.firstName,
+            reminders: rmndr.reminders,
+          },
+          template: process.cwd() + '/src/mailer/template/notification',
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
   }
 
   async transformToReminderEmailItemHandler(

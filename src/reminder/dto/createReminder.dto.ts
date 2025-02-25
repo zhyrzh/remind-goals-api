@@ -21,7 +21,7 @@ export class CreateReminderDTO {
 
   @IsDateString()
   @IsNotEmpty()
-  reminderStartDate: Date;
+  triggerDate: Date;
 
   @IsBoolean()
   @IsNotEmpty()

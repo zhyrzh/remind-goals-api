@@ -165,35 +165,35 @@ export class ReminderService {
     let adjustedDate;
     switch (reminder.frequency) {
       case FrequencyEnum.once:
-        adjustedDate = reminder.reminderStartDate;
+        adjustedDate = reminder.triggerDate;
         break;
       case FrequencyEnum.daily:
-        adjustedDate = dayjs(reminder.reminderStartDate)
+        adjustedDate = dayjs(reminder.triggerDate)
           .add(1, 'day')
           .format('MM/DD/YYYY HH:mm');
         break;
       case FrequencyEnum.weekly:
-        const dayPosition = dayjs(reminder.reminderStartDate).get('day');
+        const dayPosition = dayjs(reminder.triggerDate).get('day');
         if (dayPosition === 0) {
-          adjustedDate = dayjs(reminder.reminderStartDate)
+          adjustedDate = dayjs(reminder.triggerDate)
             .add(1, 'day')
             .format('MM/DD/YYYY HH:mm');
         } else {
           const daysToMonday =
-            7 - (dayjs(reminder.reminderStartDate).get('day') + 1) + 2;
-          adjustedDate = dayjs(reminder.reminderStartDate)
+            7 - (dayjs(reminder.triggerDate).get('day') + 1) + 2;
+          adjustedDate = dayjs(reminder.triggerDate)
             .add(daysToMonday, 'days')
             .format('MM/DD/YYYY HH:mm');
         }
 
         break;
       case FrequencyEnum.monthly:
-        adjustedDate = dayjs(reminder.reminderStartDate)
+        adjustedDate = dayjs(reminder.triggerDate)
           .add(1, 'month')
           .format('MM/DD/YYYY HH:mm');
         break;
       case FrequencyEnum.annually:
-        adjustedDate = dayjs(reminder.reminderStartDate)
+        adjustedDate = dayjs(reminder.triggerDate)
           .add(1, 'year')
           .format('MM/DD/YYYY HH:mm');
         break;
@@ -207,7 +207,7 @@ export class ReminderService {
           id: reminder.id,
         },
         data: {
-          reminderStartDate: new Date(adjustedDate),
+          triggerDate: new Date(adjustedDate),
         },
       });
     } catch (error) {
@@ -230,14 +230,14 @@ export class ReminderService {
         where: {
           AND: [
             {
-              reminderStartDate: {
+              triggerDate: {
                 gte: new Date(
                   `${dayjs().format('YYYY-MM-DD').toString()} 00:00:00`,
                 ),
               },
             },
             {
-              reminderStartDate: {
+              triggerDate: {
                 lte: new Date(
                   `${dayjs().format('YYYY-MM-DD').toString()} 23:59:59`,
                 ),

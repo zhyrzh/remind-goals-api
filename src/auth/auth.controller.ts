@@ -57,6 +57,7 @@ export class AuthController {
     response.cookie('my-key', req['user'], {
       secure: false,
       sameSite: 'none',
+      httpOnly: false,
     });
     return response.redirect(`${process.env.FRONTEND_URL}/login`);
   }
@@ -78,6 +79,7 @@ export class AuthController {
     response.cookie('my-key', req['user'], {
       secure: false,
       sameSite: 'none',
+      httpOnly: false,
     });
     return response.redirect(`${process.env.FRONTEND_URL}/signup`);
   }

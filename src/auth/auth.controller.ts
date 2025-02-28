@@ -54,7 +54,10 @@ export class AuthController {
     @Req() req: Request,
     @Res() response: Response,
   ): Promise<any> {
-    response.cookie('my-key', req['user']);
+    response.cookie('my-key', req['user'], {
+      secure: false,
+      sameSite: 'none',
+    });
     return response.redirect(`${process.env.FRONTEND_URL}/login`);
   }
 
@@ -72,7 +75,10 @@ export class AuthController {
     @Req() req: Request,
     @Res() response: Response,
   ): Promise<any> {
-    response.cookie('my-key', req['user']);
+    response.cookie('my-key', req['user'], {
+      secure: false,
+      sameSite: 'none',
+    });
     return response.redirect(`${process.env.FRONTEND_URL}/signup`);
   }
 }

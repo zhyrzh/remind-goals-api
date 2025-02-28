@@ -55,7 +55,7 @@ export class AuthController {
     @Res() response: Response,
   ): Promise<any> {
     response.cookie('my-key', req['user'], {
-      secure: false,
+      secure: true,
       sameSite: 'none',
       httpOnly: false,
     });
@@ -77,7 +77,7 @@ export class AuthController {
     @Res() response: Response,
   ): Promise<any> {
     response.cookie('my-key', req['user'], {
-      secure: false,
+      secure: true,
       sameSite: 'none',
       httpOnly: false,
     });

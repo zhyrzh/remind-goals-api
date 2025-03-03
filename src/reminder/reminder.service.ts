@@ -296,7 +296,7 @@ export class ReminderService {
           template: process.cwd() + '/src/mailer/template/notification',
         });
       } catch (error) {
-        console.log(error);
+        console.log('something went wrong', error);
       }
     }
   }

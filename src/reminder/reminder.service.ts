@@ -10,7 +10,7 @@ import { Prisma, Reminder } from '@prisma/client';
 interface IReminderEmailContent {
   user: string;
   firstName: string;
-  reminders: Reminder[];
+  reminders: IReminderWithUser[];
 }
 
 type IReminderWithUser = Prisma.ReminderGetPayload<{
@@ -53,6 +53,9 @@ export class ReminderService {
 
       // email sending
       await this.sendReminderEmail(reminderEmlContent);
+
+      // adjust triggerdate
+      this.adjustTriggerDate(data);
 
       // modified return data to not include user information
       return { ...data, User: undefined };
@@ -277,8 +280,8 @@ export class ReminderService {
     }
   }
 
-  async sendReminderEmail(reminders: IReminderEmailContent[]) {
-    for (const rmndr of reminders) {
+  async sendReminderEmail(reminderEmlContent: IReminderEmailContent[]) {
+    for (const rmndr of reminderEmlContent) {
       try {
         await this.mailerService.sendMail({
           to: rmndr.user,

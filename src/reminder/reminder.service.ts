@@ -211,6 +211,7 @@ export class ReminderService {
         },
         data: {
           triggerDate: new Date(adjustedDate),
+          isActive: true,
         },
       });
     } catch (error) {

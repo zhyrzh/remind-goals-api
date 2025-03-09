@@ -264,6 +264,7 @@ export class ReminderService {
       await this.sendReminderEmail(usersWithRemindersToday);
 
       for (const itm of reminders) {
+        console.log(itm, 'itm hr');
         await this.adjustTriggerDate(itm);
       }
     } catch (error) {

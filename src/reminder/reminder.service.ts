@@ -54,9 +54,6 @@ export class ReminderService {
       // email sending
       await this.sendReminderEmail(reminderEmlContent);
 
-      // adjust triggerdate
-      this.adjustTriggerDate(data);
-
       // modified return data to not include user information
       return { ...data, User: undefined };
     } catch (error) {
@@ -267,7 +264,7 @@ export class ReminderService {
       await this.sendReminderEmail(usersWithRemindersToday);
 
       for (const itm of reminders) {
-        this.adjustTriggerDate(itm);
+        await this.adjustTriggerDate(itm);
       }
     } catch (error) {
       throw new HttpException(

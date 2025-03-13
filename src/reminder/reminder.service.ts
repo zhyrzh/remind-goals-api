@@ -244,9 +244,6 @@ export class ReminderService {
                 ),
               },
             },
-            {
-              isActive: true,
-            },
           ],
         },
         include: {

@@ -54,10 +54,16 @@ export class AuthController {
     @Req() req: Request,
     @Res() response: Response,
   ): Promise<any> {
-    response.cookie('my-key', req['user'], {
-      domain: 'railway.app',
-    });
-    return response.redirect(`${process.env.FRONTEND_URL}/login`);
+    response.cookie('my-key', req['user']);
+    response.send(`
+      <script>
+        if (window.opener) {
+          window.opener.postMessage("auth_complete", "${process.env.FRONTEND_URL}");
+          window.opener.location.reload(); // Fallback reload
+          window.close();
+        }
+      </script>
+    `);
   }
 
   @Public()
@@ -74,9 +80,15 @@ export class AuthController {
     @Req() req: Request,
     @Res() response: Response,
   ): Promise<any> {
-    response.cookie('my-key', req['user'], {
-      domain: 'railway.app',
-    });
-    return response.redirect(`${process.env.FRONTEND_URL}/signup`);
+    response.cookie('my-key', req['user']);
+    response.send(`
+      <script>
+        if (window.opener) {
+          window.opener.postMessage("auth_complete", "${process.env.FRONTEND_URL}");
+          window.opener.location.reload(); // Fallback reload
+          window.close();
+        }
+      </script>
+    `);
   }
 }

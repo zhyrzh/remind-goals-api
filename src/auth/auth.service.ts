@@ -3,12 +3,12 @@ import {
   HttpStatus,
   Injectable,
   NotAcceptableException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterUserDTO } from './dto/registerUser.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import type { UserCredentials as IUserCredentials } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -70,12 +70,15 @@ export class AuthService {
     }
   }
 
-  async validateUser(username: string, pass: string): Promise<any> {
+  async validateUser(
+    username: string,
+    pass: string,
+  ): Promise<Omit<IUserCredentials, 'password'>> | null {
     try {
       const user = await this.findOne(username);
 
-      if (!user) {
-        return new UnauthorizedException('Invalid credentials');
+      if (user === null) {
+        return null;
       }
 
       const { password, ...otherDetails } = user;
@@ -83,7 +86,7 @@ export class AuthService {
       const isPasswordValid = await bcrypt.compare(pass, password);
 
       if (!isPasswordValid) {
-        return new UnauthorizedException('Invalid credentials');
+        return null;
       }
 
       return otherDetails;
